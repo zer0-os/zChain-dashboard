@@ -1,0 +1,22 @@
+{
+  "name": "meowconsole",
+  "version": "0.0.1",
+  "description": "meow graphic console",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "bustawei",
+  "license": "ISC",
+  "dependencies": {
+    "big-integer": "^1.6.51",
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.11.0",
+    "chalk": "^5.0.1",
+    "graphql-request": "^4.2.0",
+    "ip2location-nodejs": "^9.1.0",
+    "p-iteration": "^1.1.8",
+    "web3": "^1.7.3"
+  }
+}
