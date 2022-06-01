@@ -349,7 +349,7 @@ export class ZScreen {
                         top :'20%',
                         fg:'green',
                         align:'right',
-                        content: (myEthAddress !== "" ) ? myEthAddress.toString(): "Verify your address in settings"
+                        content: (myEthAddress && myEthAddress !== "" ) ? myEthAddress.toString(): "Verify your address in settings"
                 })
 		this.nodeFollowedPeersCountLabel = blessed.text({
                         parent : this.dynamicBox,
