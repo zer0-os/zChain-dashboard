@@ -13,19 +13,21 @@ let connectedPeers = [];
 let currentInterval;
 let ip2location;
 let web3;
-let ethAddresses;
+let ethAddresses,nodeEthDefaultAddress;
 let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 (async() => {
 	try {
 		myScreen = new ZScreen();
-	        myScreen.screen.render()
-		routeOutput();
+                myScreen.screen.render()
+                routeOutput();
 		web3 = new Web3(Web3.givenProvider)
 		myMeow = await new Meow("dashboard")
 		myPeerId = myMeow.zchain.node.peerId.toB58String()
-		let nodeEthDefaultAddress = await myMeow.store.getPeerEthAddressAndSignature(myPeerId)
-        	if(nodeEthDefaultAddress && nodeEthDefaultAddress["defaultAddress"])
-                	console.log(nodeEthDefaultAddress["defaultAddress"])
+		nodeEthDefaultAddress = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(myPeerId)
+        	if(nodeEthDefaultAddress && nodeEthDefaultAddress["defaultAddress"]){
+                	nodeEthDefaultAddress = nodeEthDefaultAddress["defaultAddress"]
+			myScreen.configBox.content ="  {white-fg}{bold}Auto update:  {/}   10 sec \n  {white-fg}{bold}Zchain status:  {/} Connected\n  {white-fg}{bold}Twitter:  {/}       Disabled\n  {white-fg}{bold}Ethereum:  {/}      Verified";
+		}
 		infosInterval()
 		currentInterval = setInterval(infosInterval,10000)
 		handleConnections();
@@ -62,7 +64,7 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 				if(currentInterval !== undefined)
 					clearInterval(currentInterval)
 				try{
-					ethAddresses = await myMeow.store.getPeerEthAddressAndSignature(myPeerId)
+					ethAddresses = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(myPeerId)
 				}catch(e){}
 				myScreen.showVerifiedAddresses(ethAddresses)
 				handleEthAddressClick()
@@ -148,7 +150,7 @@ async function handleEthVerify(){
 			if(ethSig){
 				try{
 					let duplicated = false;
-					let ethData = await myMeow.store.getPeerEthAddressAndSignature(myPeerId)
+					let ethData = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(myPeerId)
 					if(ethData && ethData["meta"]){
 	                			ethData["meta"].forEach(data=>{
 							if(data["ethAddress"] === web3.utils.toChecksumAddress(ethAddress)) duplicated =true;
@@ -190,7 +192,7 @@ async function infosInterval(){
 	let onGoingMeow =""
 	if(myScreen.sendMeowText)
 		onGoingMeow = myScreen.sendMeowText.content
-        myScreen.showInfos(myPeerId,"",followedPeersCount,followedChannelsCount,connectedPeers.length)
+        myScreen.showInfos(myPeerId,nodeEthDefaultAddress,followedPeersCount,followedChannelsCount,connectedPeers.length)
 	if(onGoingMeow != ""){
 		myScreen.sendMeowText.setValue(onGoingMeow)
 		myScreen.sendMeowText.focus()
@@ -281,7 +283,7 @@ async function handleNameChange(){
                 });
 		if(followed){
 			let addressesValid = true;
-			let ethAddresses = await myMeow.store.getPeerEthAddressAndSignature(targetPeerId)
+			let ethAddresses = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(targetPeerId)
 			if(ethAddresses && ethAddresses["meta"] &&  Object.entries(ethAddresses["meta"]).length > 0){
 				ethAddresses["meta"].forEach(address=>{
 					if(web3.utils.isAddress(address["ethAddress"])){
