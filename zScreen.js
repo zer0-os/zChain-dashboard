@@ -654,7 +654,7 @@ export class ZScreen {
 			tags:'true',
 			height:'18%',
 			border :{type :'bg',ch:'¤','fg':'blue'},
-			content : '  {white-fg}{bold}Auto update:  {/}   10 sec \n  {white-fg}{bold}Zchain status:  {/} Connected\n  {white-fg}{bold}Twitter:  {/}       Disabled\n  {white-fg}{bold}Ethereum:  {/}     Not verified'
+			content : '  {white-fg}{bold}Auto update:  {/}   10 sec \n  {white-fg}{bold}Zchain status:  {/} Connected\n  {white-fg}{bold}Twitter:  {/}       Disabled\n  {white-fg}{bold}Ethereum:  {/}      Not verified'
 		});
 		this.dynamicBox = blessed.box({
 			align: 'center',

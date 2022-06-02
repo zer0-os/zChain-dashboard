@@ -23,11 +23,6 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 		web3 = new Web3(Web3.givenProvider)
 		myMeow = await new Meow("dashboard")
 		myPeerId = myMeow.zchain.node.peerId.toB58String()
-		nodeEthDefaultAddress = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(myPeerId)
-        	if(nodeEthDefaultAddress && nodeEthDefaultAddress["defaultAddress"]){
-                	nodeEthDefaultAddress = nodeEthDefaultAddress["defaultAddress"]
-			myScreen.configBox.content ="  {white-fg}{bold}Auto update:  {/}   10 sec \n  {white-fg}{bold}Zchain status:  {/} Connected\n  {white-fg}{bold}Twitter:  {/}       Disabled\n  {white-fg}{bold}Ethereum:  {/}      Verified";
-		}
 		infosInterval()
 		currentInterval = setInterval(infosInterval,10000)
 		handleConnections();
@@ -197,6 +192,14 @@ async function infosInterval(){
 		myScreen.sendMeowText.setValue(onGoingMeow)
 		myScreen.sendMeowText.focus()
 	}
+	nodeEthDefaultAddress = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(myPeerId)
+        if(nodeEthDefaultAddress && nodeEthDefaultAddress["defaultAddress"]){
+	        nodeEthDefaultAddress = nodeEthDefaultAddress["defaultAddress"]
+		myScreen.configBox.content ="  {white-fg}{bold}Auto update:  {/}   10 sec \n  {white-fg}{bold}Zchain status:  {/} Connected\n  {white-fg}{bold}Twitter:  {/}       Disabled\n  {white-fg}{bold}Ethereum:  {/}      Verified";
+		myScreen.nodeEthAddress.content = nodeEthDefaultAddress.toString()
+		myScreen.screen.render()
+        }
+
 	myScreen.sendMeowSubmit.on('click',async function(){
 		let meowText = myScreen.sendMeowText.content.toString()
 		if(meowText !== undefined && meowText !== ""){
