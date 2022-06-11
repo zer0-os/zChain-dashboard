@@ -34,7 +34,7 @@ export class ZScreen {
 		});
 		this.initScreen()
 	}
-	showChannelFeed(channelFeed,channelName){
+	showChannelFeed(channelFeed,channelName,networkName){
 		this.emptyDynamicBox()
 		this.dynamicBox.setLabel("Channel "+channelName)
 		this.formattedChannelFeed=[[]]
@@ -56,6 +56,7 @@ export class ZScreen {
                         border:'line',
                         align:'left',
                         tags:true,
+			name :networkName,
                         style: {border: {fg: 'blue'},header: {fg: 'green',bold: true},cell: {fg: 'magenta',selected:{bg:'blue'},align:'center'}},
                         scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
 		})
@@ -98,9 +99,70 @@ export class ZScreen {
 
 		this.screen.render()
 	}
-	showChannels(followedChannels){
+	showNetworks(myNetworks){
 		this.emptyDynamicBox()
-		this.dynamicBox.setLabel("Followed channels")
+		this.dynamicBox.setLabel("Available networks")
+		this.availableNetworks=[["Networks"]]
+		if(myNetworks){
+			myNetworks.forEach(network=>{
+				this.availableNetworks.push([network["network"]]);
+			});
+		}
+		this.availableNetworksTable = blessed.listtable({
+                        parent: this.dynamicBox,
+                        left:'center',
+                        top:'1%',
+                        mouse:true,
+                        width:'98%',
+                        height:'75%',
+                        data: this.availableNetworks,
+                        border:'line',
+                        align:'center',
+                        tags:true,
+                        style: {border: {fg: 'blue'},header: {fg: 'green',bold: true},cell: {fg: 'magenta',selected:{bg:'blue'},align:'center'}},
+                        scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
+                });
+                this.createNetworkLabel = blessed.text({
+                        parent:this.dynamicBox,
+                        left:'1%',
+                        top :'80%',
+                        tags :true,
+                        content : '{bold}Network name : {/bold}'
+                });
+		this.createNetworkValue = blessed.textbox({
+                        parent: this.dynamicBox,
+                        mouse: true,
+                        keys: true,
+                        align:'center',
+                        style: {bg: 'blue'},
+                        height: 1,
+                        width: 30,
+                        left: '20%',
+                        top: '80%',
+                        value: null,
+                        inputOnFocus: true
+                });
+                this.createNetworkSubmit = blessed.button({
+                        parent: this.dynamicBox,
+                        mouse: true,
+                        keys: true,
+                        padding: {left: 1,right: 1},
+                        left: '70%',
+                        top: '80%',
+                        shrink: true,
+                        width: '17%',
+                        align: 'center',
+                        tags:'true',
+                        content: '{bold}Create network{/bold}',
+                        style: {bg: 'blue',align:'center',focus: {bg: 'red'}}
+                });
+                this.screen.render()
+
+
+	}
+	showChannels(followedChannels,networkName){
+		this.emptyDynamicBox()
+		this.dynamicBox.setLabel(networkName)
 		this.followedChannels =[["Channel name"]]
 		if(followedChannels){
 			followedChannels.forEach(channel=>{
@@ -118,6 +180,7 @@ export class ZScreen {
 			border:'line',
 			align:'center',
 			tags:true,
+			name:networkName,
 			style: {border: {fg: 'blue'},header: {fg: 'green',bold: true},cell: {fg: 'magenta',selected:{bg:'blue'},align:'center'}},
                         scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
 		});
@@ -152,6 +215,7 @@ export class ZScreen {
                         width: '17%',
                         align: 'center',
                         tags:'true',
+			name:networkName,
                         content: '{bold}Follow channel{/bold}',
                         style: {bg: 'blue',align:'center',focus: {bg: 'red'}}
                 });
@@ -689,7 +753,7 @@ export class ZScreen {
 			left: '3%',
 			tags: true,
 			invertSelected: false,
-			items: ["♟  MY NODE DETAILS","▶  CONNECTED PEERS","✉  CHANNELS","❤  ADDRESS BOOK","⚙  ETHEREUM ADDRESS","♦  VERIFIED ADDRESSES"],
+			items: ["♟  MY NODE DETAILS","▶  CONNECTED PEERS","✉  NETWORKS","❤  ADDRESS BOOK","⚙  ETHEREUM ADDRESS","♦  VERIFIED ADDRESSES"],
 			scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
 		});
 		this.screen.append(this.menuBox)

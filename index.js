@@ -64,47 +64,76 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 				myScreen.showVerifiedAddresses(ethAddresses)
 				handleEthAddressClick()
 			}
-			else if(String(element.content).includes("CHANNELS")){
+			else if(String(element.content).includes("NETWORKS")){
 				if(currentInterval !== undefined)
-					clearInterval(currentInterval)
-				let followedChannels = await myMeow.getFollowedChannels()
-				myScreen.showChannels(followedChannels);
-				handleFollowChannelSubmit()
-				handleFetchChannelFeed()
+                                        clearInterval(currentInterval)
+				let availableNetworks = await myMeow.getNetworkList()
+				myScreen.showNetworks(availableNetworks)
+				handleNetworkClick()
+				handleCreateNetwork()
 			}
 		});
 	} catch(e){}
 })();
 
+async function handleCreateNetwork(){
+	myScreen.createNetworkSubmit.on("click",async()=>{
+		let networkName = myScreen.createNetworkValue.content.toString()
+		if(networkName && networkName !== ""){
+			try{
+				await myMeow.createNetwork(networkName,[])
+				myScreen.showChannels([],networkName)
+				handleFollowChannelSubmit()
+				handleFetchChannelFeed();
+			}catch(e){console.log("Verify your eth address to create a network");}
+		}
+	});
+}
+async function handleNetworkClick(){
+	myScreen.availableNetworksTable.on("element click",async(element,mouse)=>{
+		let networkName = element.content.toString().replace(/ /g,'')
+		if(networkName && networkName !==""){
+			let networkChannels = await myMeow.getNetworkMetadata(networkName);
+			myScreen.showChannels(networkChannels["channels"],networkName)
+			handleFollowChannelSubmit()
+			handleFetchChannelFeed()
+		}
+	});
+}
 async function handleSendInChannel(){
 	myScreen.sendMeowChannelSubmit.on("click",async()=>{
 		let channelName = myScreen.sendMeowChannelSubmit.name
+		let networkName = myScreen.channelFeedTable.name
 		let msgToSend = myScreen.sendMeowChannelText.content.toString()
 		if(msgToSend && msgToSend !==""){
-			await myMeow.sendMeow(msgToSend+" "+channelName)
-			let channelFeed = await myMeow.getChannelFeed(channelName,100)
-                        myScreen.showChannelFeed(channelFeed,channelName)
+			await myMeow.sendMeow(msgToSend+" "+channelName,false,networkName)
+			let channelFeed = await myMeow.getChannelFeed(channelName,100,networkName)
+                        myScreen.showChannelFeed(channelFeed,channelName,networkName)
                         handleSendInChannel()
 		}
 	});
 }
 async function handleFetchChannelFeed(){
 	myScreen.followedChannelsTable.on("element click",async(element,mouse) =>{
+		let networkName = myScreen.followedChannelsTable.name
 		let channelName = element.content.toString().replace(/ /g,'')
 		if(channelName && channelName !==""){
-			let channelFeed = await myMeow.getChannelFeed(channelName,100)
-			myScreen.showChannelFeed(channelFeed,channelName)
+			channelName = channelName.substring(channelName.lastIndexOf("#"))
+			let channelFeed = await myMeow.getChannelFeed(channelName,100,networkName)
+			myScreen.showChannelFeed(channelFeed,channelName,networkName)
 			handleSendInChannel()
 		}
 	});
 }
 async function handleFollowChannelSubmit(){
 	myScreen.followChannelSubmit.on("click", async function(){
+		let networkName = myScreen.followChannelSubmit.name
 		let channelName = myScreen.followChannelValue.value.toString()
 		if(channelName && channelName !==""){
-			await myMeow.followChannel(channelName)
+			await myMeow.addChannelInNetwork(networkName,channelName)
+			await myMeow.followChannel(channelName,networkName)
 			let followedChannels = await myMeow.getFollowedChannels()
-			myScreen.showChannels(followedChannels)
+			myScreen.showChannels(followedChannels,networkName)
 			myScreen.dynamicBox.focus()
 			handleFollowChannelSubmit()
 			handleFetchChannelFeed()
@@ -341,7 +370,7 @@ async function handleConnections(){
 async function routeOutput(){
 	 for (let func in console) {
                 //if (func == "error") continue;
-                if (func == "log"  || func == "error"){
+                if (func == "log" || func == "error"){
                         console[func] = function(text,extra) {
                                 if(extra === undefined) extra="";
                                 if(text.length > 0){
