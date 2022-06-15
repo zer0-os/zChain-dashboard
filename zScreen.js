@@ -34,6 +34,76 @@ export class ZScreen {
 		});
 		this.initScreen()
 	}
+	showTwitterSettings(twitterAuthLink){
+		this.emptyDynamicBox();
+		this.twitterMessage = blessed.text({
+			parent: this.dynamicBox,
+			left:'center',
+			top :'1%',
+			tags:'true',
+			width:'98%',
+			content : '⚠  {bold}Follow these steps to enable twitter on your dashboard :{/bold} \n\n    *Copy and paste this link in your browser {bold}(Use shift+mouse to select){/bold} \n             {underline}{bold}'+twitterAuthLink.toString()+'{/} \n    *After authorizing the app copy and paste the pin below \n'
+		});
+		this.twitterPinLabel =blessed.text({
+			parent: this.dynamicBox,
+			top:'40%',
+			left :'1%',
+			tags:true,
+			fg:'white',
+			content :'{bold}Twitter pin :{/bold}'
+		});
+		this.twitterPinInput = blessed.textbox({
+                        parent: this.dynamicBox,
+                        mouse: true,
+                        keys: true,
+                        align:'left',
+                        style: {bg: 'white',fg:'black'},
+                        height: 1,
+                        width: "60%",
+                        left: '25%',
+                        top: '40%',
+                        inputOnFocus: true
+		});
+		this.twitterPinSubmit = blessed.button({
+			parent: this.dynamicBox,
+                        mouse: true,
+                        keys: true,
+                        padding: {left: 1,right: 1},
+                        top: '50%',
+                        shrink: true,
+                        width: '18%',
+			left :'45%',
+                        align: 'center',
+                        tags:'true',
+                        content: '{bold}Enable twitter{/bold}',
+                        style: {bg: 'blue',align:'center',focus: {bg: 'white'}}
+		});
+		this.twitterDisableMessage = blessed.text({
+			parent: this.dynamicBox,
+                        left:'center',
+                        top :'70%',
+                        tags:'true',
+                        width:'98%',
+			fg:'red',
+                        content : '⚠  {bold} If twitter is already enabled you can disable it from here'
+		});
+		this.twitterDisableSubmit = blessed.button({
+			parent: this.dynamicBox,
+                        mouse: true,
+                        keys: true,
+                        padding: {left: 1,right: 1},
+                        top: '80%',
+                        shrink: true,
+                        width: '18%',
+                        left :'45%',
+                        align: 'center',
+                        tags:'true',
+                        content: '{bold}Disable twitter{/bold}',
+                        style: {bg: 'blue',align:'center',focus: {bg: 'white'}}
+
+		});
+		this.screen.render();
+	}
 	showChannelFeed(channelFeed,channelName,networkName){
 		this.emptyDynamicBox()
 		this.dynamicBox.setLabel("Channel "+channelName)
@@ -762,7 +832,7 @@ export class ZScreen {
 			left: '3%',
 			tags: true,
 			invertSelected: false,
-			items: ["♟  MY NODE DETAILS","▶  CONNECTED PEERS","✉  NETWORKS","❤  ADDRESS BOOK","⚙  ETHEREUM ADDRESS","♦  VERIFIED ADDRESSES"],
+			items: ["♟  MY NODE DETAILS","▶  CONNECTED PEERS","✉  NETWORKS","❤  ADDRESS BOOK","⚙  ETHEREUM ADDRESS","♦  VERIFIED ADDRESSES","✎  TWITTER"],
 			scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
 		});
 		this.screen.append(this.menuBox)

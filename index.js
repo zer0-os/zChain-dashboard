@@ -72,10 +72,31 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 				handleNetworkClick()
 				handleCreateNetwork()
 			}
+			else if(String(element.content).includes("TWITTER")){
+				if(currentInterval != undefined)
+					clearInterval(currentInterval)
+				await showTwitterSettings()
+			}
 		});
 	} catch(e){}
 })();
 
+async function showTwitterSettings(){
+	let twitterAuthData = await myMeow.getTwitterAuthLink()
+	let twitterAuthUrl = twitterAuthData["url"]
+	myScreen.showTwitterSettings(twitterAuthUrl)
+	myScreen.twitterPinSubmit.on("click",async()=>{
+		let twitterPin = myScreen.twitterPinInput.content.toString()
+		if(twitterPin && twitterPin.length == 7){
+			await myMeow.enableTwitterUsingPIN(twitterAuthData,twitterPin)
+			showTwitterSettings()
+		}
+	});
+	myScreen.twitterDisableSubmit.on("click",async()=>{
+		await myMeow.disableTwitter()
+		showTwitterSettings()
+	});
+}
 async function handleCreateNetwork(){
 	myScreen.createNetworkSubmit.on("click",async()=>{
 		let networkName = myScreen.createNetworkValue.content.toString()
