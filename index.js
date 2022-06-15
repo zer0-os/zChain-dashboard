@@ -88,8 +88,10 @@ async function showTwitterSettings(){
 	myScreen.twitterPinSubmit.on("click",async()=>{
 		let twitterPin = myScreen.twitterPinInput.content.toString()
 		if(twitterPin && twitterPin.length == 7){
-			await myMeow.enableTwitterUsingPIN(twitterAuthData,twitterPin)
-			showTwitterSettings()
+			try{
+				await myMeow.enableTwitterUsingPIN(twitterAuthData,twitterPin)
+				showTwitterSettings()
+			}catch(e){}
 		}
 	});
 	myScreen.twitterDisableSubmit.on("click",async()=>{
@@ -398,7 +400,7 @@ async function handleConnections(){
 async function routeOutput(){
 	 for (let func in console) {
                 //if (func == "error") continue;
-                if (func == "log"  || func == "error"){
+                if (func == "log" || func == "error"){
                         console[func] = function(text,extra) {
                                 if(extra === undefined) extra="";
                                 if(text.length > 0){
