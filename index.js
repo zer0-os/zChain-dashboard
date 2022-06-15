@@ -155,8 +155,8 @@ async function handleFollowChannelSubmit(){
 		if(channelName && channelName !==""){
 			await myMeow.addChannelInNetwork(networkName,channelName)
 			await myMeow.followChannel(channelName,networkName)
-			let followedChannels = await myMeow.getFollowedChannels()
-			myScreen.showChannels(followedChannels,networkName)
+			let networkChannels = await myMeow.getNetworkMetadata(networkName);
+			myScreen.showChannels(networkChannels["channels"],networkName)
 			myScreen.dynamicBox.focus()
 			handleFollowChannelSubmit()
 			handleFetchChannelFeed()
