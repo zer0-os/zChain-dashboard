@@ -376,8 +376,8 @@ async function handleConnections(){
 }
 async function routeOutput(){
 	 for (let func in console) {
-                if (func == "error") continue;
-                if (func == "log"){ //  || func == "error"){
+                //if (func == "error") continue;
+                if (func == "log"  || func == "error"){
                         console[func] = function(text,extra) {
                                 if(extra === undefined) extra="";
                                 if(text.length > 0){
