@@ -503,6 +503,15 @@ export class ZScreen {
                         content: '    {bold}Send meow{/bold}',
                         style: {bg: 'blue',align:'center',focus: {bg: 'red'}}
                 });
+		this.sendMeowTwitter = blessed.checkbox({
+			parent:this.dynamicBox,
+			mouse : true,
+			keys :true,
+			left:  '80%',
+			top:  '82%',
+			align:'center',
+			text :'Post on twitter'
+		});
 		this.screen.render()
 	}
 	showPeer(peerId,peerName,peerFeed){

@@ -216,7 +216,13 @@ async function infosInterval(){
 	let onGoingMeow =""
 	if(myScreen.sendMeowText)
 		onGoingMeow = myScreen.sendMeowText.content
+	let twitterChecked = false;
+	if(myScreen.sendMeowTwitter && myScreen.sendMeowTwitter.checked)
+		twitterChecked = true;
         myScreen.showInfos(myPeerId,nodeEthDefaultAddress,followedPeersCount,followedChannelsCount,connectedPeers.length)
+	if(twitterChecked){
+                myScreen.sendMeowTwitter.checked = true;
+        }
 	if(onGoingMeow != ""){
 		myScreen.sendMeowText.setValue(onGoingMeow)
 		myScreen.sendMeowText.focus()
@@ -232,7 +238,8 @@ async function infosInterval(){
 	myScreen.sendMeowSubmit.on('click',async function(){
 		let meowText = myScreen.sendMeowText.content.toString()
 		if(meowText !== undefined && meowText !== ""){
-			await myMeow.sendMeow(meowText);
+			let twitterCheck = myScreen.sendMeowTwitter.checked;
+			await myMeow.sendMeow(meowText,twitterCheck);
 			myScreen.sendMeowText.setContent("")
 			infosInterval()
 		}
@@ -369,8 +376,8 @@ async function handleConnections(){
 }
 async function routeOutput(){
 	 for (let func in console) {
-                //if (func == "error") continue;
-                if (func == "log" || func == "error"){
+                if (func == "error") continue;
+                if (func == "log"){ //  || func == "error"){
                         console[func] = function(text,extra) {
                                 if(extra === undefined) extra="";
                                 if(text.length > 0){
