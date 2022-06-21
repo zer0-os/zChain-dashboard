@@ -31,5 +31,5 @@ Tested with Ubuntu 20 and Node v16.3.1
 
 N.B : If the map shows ?? and the encoding is messed up type in console :
 
-export LC_ALL=C.UTF-8
-export LANG=C.UTF-8
+* export LC_ALL=C.UTF-8
+* export LANG=C.UTF-8
