@@ -92,7 +92,6 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 async function handleAvailableNetworksClick(){
 	myScreen.allNetworksTable.on("element click",async(element,mouse)=>{
 		let networkName = element.content.toString().replace(/ /g,'')
-		console.log(networkName)
                 if(networkName && networkName !==""){
 			try{
 				await myMeow.joinNetwork(networkName);
@@ -316,13 +315,20 @@ async function infosInterval(){
 		myScreen.sendMeowText.focus()
 	}
 	nodeEthDefaultAddress = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(myPeerId)
-        if(nodeEthDefaultAddress && nodeEthDefaultAddress["defaultAddress"]){
-	        nodeEthDefaultAddress = nodeEthDefaultAddress["defaultAddress"]
-		myScreen.configBox.content ="  {white-fg}{bold}Auto update:  {/}   10 sec \n  {white-fg}{bold}Zchain status:  {/} Connected\n  {white-fg}{bold}Twitter:  {/}       Disabled\n  {white-fg}{bold}Ethereum:  {/}      Verified";
-		myScreen.nodeEthAddress.content = nodeEthDefaultAddress.toString()
-		myScreen.screen.render()
-        }
-
+	let ethEnabled=false;
+	let ethAddress="";
+	if(nodeEthDefaultAddress && nodeEthDefaultAddress["defaultAddress"]){
+		ethEnabled = true;
+		ethAddress = nodeEthDefaultAddress["defaultAddress"]
+	}
+	let isTwitterEnabled = myMeow.getTwitterConfig()
+	let twitterEnabled =false;
+	if(isTwitterEnabled)
+		twitterEnabled=true;
+	myScreen.updateConfigBox(twitterEnabled,ethEnabled)
+	if(ethAddress !=="")
+		myScreen.nodeEthAddress.content = ethAddress;
+	myScreen.screen.render()
 	myScreen.sendMeowSubmit.on('click',async function(){
 		let meowText = myScreen.sendMeowText.content.toString()
 		if(meowText !== undefined && meowText !== ""){
@@ -469,8 +475,8 @@ async function routeOutput(){
     	return (!!a) && (a.constructor === Object);
 	};
 	 for (let func in console) {
-                //if (func == "error") continue;
-                if (func == "log"  || func == "error"){
+                if (func == "error") continue;
+                if (func == "log" ){ // || func == "error"){
                         console[func] = function(text,extra) {
                                 if(extra === undefined) extra="";
                                 if(text.length > 0){

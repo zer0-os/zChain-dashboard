@@ -825,6 +825,11 @@ export class ZScreen {
 		this.dynamicBox.focus()
 		this.screen.render()
 	}
+	updateConfigBox(_isTwitter,_isEth){
+		let twitterEnabled = (_isTwitter)? "Enabled":"Disabled";
+                let ethEnabled = (_isEth)? "Verified" :"Not verified";
+		this.configBox.content ='  {white-fg}{bold}Auto update:  {/}   10 sec \n  {white-fg}{bold}Zchain status:  {/} Connected\n  {white-fg}{bold}Twitter:  {/}       '+twitterEnabled+'\n  {white-fg}{bold}Ethereum:  {/}      '+ethEnabled
+	}
 	initScreen(){
 		this.titleText = blessed.log({
 			parent:this.container,
