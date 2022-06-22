@@ -166,12 +166,61 @@ export class ZScreen {
                         content: '    {bold}Send message{/bold}',
                         style: {bg: 'blue',focus: {bg: 'red'}}
                 });
+		this.sendMeowChannelUnfollow = blessed.button({
+			parent: this.dynamicBox,
+                        mouse: true,
+                        keys: true,
+                        padding: {left: 1,right: 1},
+                        left: '80%',
+                        top: '87%',
+                        shrink: true,
+                        width: '18%',
+                        align: 'left',
+                        tags:'true',
+                        name : channelName,
+                        content: '    {bold}Unfollow{/bold}',
+                        style: {bg: 'red',focus: {bg: 'red'}}
+		});
 
 		this.screen.render()
 	}
-	showNetworks(myNetworks){
+	showAvailableNetworks(networks){
 		this.emptyDynamicBox()
 		this.dynamicBox.setLabel("Available networks")
+		this.allNetworks=[["Networks"]]
+		if(networks){
+			networks.forEach(network=>{
+				this.allNetworks.push([network["network"]]);
+			});
+		}
+		this.allNetworksTable = blessed.listtable({
+                        parent: this.dynamicBox,
+                        left:'center',
+                        top:'1%',
+                        mouse:true,
+                        width:'98%',
+                        height:'75%',
+                        data: this.allNetworks,
+                        border:'line',
+                        align:'center',
+                        tags:true,
+                        style: {border: {fg: 'blue'},header: {fg: 'green',bold: true},cell: {fg: 'magenta',selected:{bg:'blue'},align:'center'}},
+                        scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
+                });
+		this.availableNetworksLabel = blessed.text({
+			parent: this.dynamicBox,
+			left:'1%',
+			top:'80%',
+			tags : true,
+			content : '⚠  {bold}Click on a network to join it and follow all the network channels available{/bold}'
+		})
+                this.screen.render()
+
+	}
+
+	showMyNetworks(myNetworks){
+		this.emptyDynamicBox()
+		this.dynamicBox.setLabel("Followed networks")
 		this.availableNetworks=[["Networks"]]
 		if(myNetworks){
 			myNetworks.forEach(network=>{
@@ -289,6 +338,21 @@ export class ZScreen {
                         content: '{bold}Follow channel{/bold}',
                         style: {bg: 'blue',align:'center',focus: {bg: 'red'}}
                 });
+		this.leaveNetworkSubmit = blessed.button({
+			parent: this.dynamicBox,
+                        mouse: true,
+                        keys: true,
+                        padding: {left: 1,right: 1},
+                        left: '70%',
+                        top: '87%',
+                        shrink: true,
+                        width: '17%',
+                        align: 'center',
+                        tags:'true',
+                        name:networkName,
+                        content: '{bold}Leave network{/bold}',
+                        style: {bg: 'red',align:'center',focus: {bg: 'red'}}
+		});
 		this.screen.render()
 	}
 	showOwnedDomains(ownedDomains){
@@ -709,6 +773,7 @@ export class ZScreen {
                         scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
 		})
 		peerFeed.forEach(feed =>{
+			console.log(feed)
 			this.peerFeedLog.log("Message published in channels ("+feed["channel"].toString()+") : "+feed["message"])
 		});
 		this.screen.render()
@@ -832,7 +897,7 @@ export class ZScreen {
 			left: '3%',
 			tags: true,
 			invertSelected: false,
-			items: ["♟  MY NODE DETAILS","▶  CONNECTED PEERS","✉  NETWORKS","❤  ADDRESS BOOK","⚙  ETHEREUM ADDRESS","♦  VERIFIED ADDRESSES","✎  TWITTER"],
+			items: ["♟  MY NODE DETAILS","▶  CONNECTED PEERS","✉  MY NETWORKS","✉  ALL NETWORKS","❤  ADDRESS BOOK","⚙  ETHEREUM ADDRESS","♦  VERIFIED ADDRESSES","✎  TWITTER"],
 			scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
 		});
 		this.screen.append(this.menuBox)

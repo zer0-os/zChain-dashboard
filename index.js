@@ -64,14 +64,22 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 				myScreen.showVerifiedAddresses(ethAddresses)
 				handleEthAddressClick()
 			}
-			else if(String(element.content).includes("NETWORKS")){
+			else if(String(element.content).includes("MY NETWORKS")){
 				if(currentInterval !== undefined)
                                         clearInterval(currentInterval)
-				let availableNetworks = await myMeow.getNetworkList()
-				myScreen.showNetworks(availableNetworks)
+				let availableNetworks = await myMeow.getMyNetworks()
+				myScreen.showMyNetworks(availableNetworks)
 				handleNetworkClick()
 				handleCreateNetwork()
 			}
+			else if(String(element.content).includes("ALL NETWORKS")){
+                                if(currentInterval !== undefined)
+                                        clearInterval(currentInterval)
+                                let allNetworks = await myMeow.getNetworkList()
+                                myScreen.showAvailableNetworks(allNetworks)
+				handleAvailableNetworksClick();
+                        }
+
 			else if(String(element.content).includes("TWITTER")){
 				if(currentInterval != undefined)
 					clearInterval(currentInterval)
@@ -81,6 +89,29 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 	} catch(e){}
 })();
 
+async function handleAvailableNetworksClick(){
+	myScreen.allNetworksTable.on("element click",async(element,mouse)=>{
+		let networkName = element.content.toString().replace(/ /g,'')
+		console.log(networkName)
+                if(networkName && networkName !==""){
+			try{
+				await myMeow.joinNetwork(networkName);
+				let networks = await myMeow.getMyNetworks();
+                        	let networkChannels;
+                        	if(networks){
+                                	networks.forEach(network =>{
+                                        	if(networkName == network["network"])
+                                                	networkChannels = network["channels"];
+                                	});
+                        	}
+                        	myScreen.showChannels(networkChannels,networkName)
+                        	handleFollowChannelSubmit()
+                        	handleFetchChannelFeed()
+
+			}catch(e){console.log(e)}
+		}
+	});
+}
 async function showTwitterSettings(){
 	let twitterAuthData = await myMeow.getTwitterAuthLink()
 	let twitterAuthUrl = twitterAuthData["url"]
@@ -104,11 +135,16 @@ async function handleCreateNetwork(){
 		let networkName = myScreen.createNetworkValue.content.toString()
 		if(networkName && networkName !== ""){
 			try{
-				await myMeow.createNetwork(networkName,[])
-				myScreen.showChannels([],networkName)
-				handleFollowChannelSubmit()
-				handleFetchChannelFeed();
-			}catch(e){console.log("Verify your eth address to create a network");}
+				let ethData = await myMeow.zchain.zStore.getPeerEthAddressAndSignature(myPeerId)
+				if(ethData && ethData["meta"]){
+					await myMeow.createNetwork(networkName,[])
+					myScreen.showChannels([],networkName)
+					handleFollowChannelSubmit()
+					handleFetchChannelFeed();
+				}else{
+					console.log("Verify your eth address to create a network");
+				}
+			}catch(e){console.log("Creating network failed");}
 		}
 	});
 }
@@ -116,8 +152,15 @@ async function handleNetworkClick(){
 	myScreen.availableNetworksTable.on("element click",async(element,mouse)=>{
 		let networkName = element.content.toString().replace(/ /g,'')
 		if(networkName && networkName !==""){
-			let networkChannels = await myMeow.getNetworkMetadata(networkName);
-			myScreen.showChannels(networkChannels["channels"],networkName)
+			let networks = await myMeow.getMyNetworks();
+			let networkChannels;
+			if(networks){
+				networks.forEach(network =>{
+					if(networkName == network["network"])
+						networkChannels = network["channels"];
+				});
+			}
+			myScreen.showChannels(networkChannels,networkName)
 			handleFollowChannelSubmit()
 			handleFetchChannelFeed()
 		}
@@ -134,6 +177,18 @@ async function handleSendInChannel(){
                         myScreen.showChannelFeed(channelFeed,channelName,networkName)
                         handleSendInChannel()
 		}
+	});
+	myScreen.sendMeowChannelUnfollow.on("click",async()=>{
+		let channelName = myScreen.sendMeowChannelSubmit.name
+		let networkName = myScreen.channelFeedTable.name
+		try{
+			console.log(networkName)
+			await myMeow.unFollowChannel(channelName,networkName)
+		}catch(e){}
+		let availableNetworks = await myMeow.getMyNetworks()
+                myScreen.showMyNetworks(availableNetworks)
+                handleNetworkClick()
+                handleCreateNetwork()
 	});
 }
 async function handleFetchChannelFeed(){
@@ -153,13 +208,23 @@ async function handleFollowChannelSubmit(){
 		let networkName = myScreen.followChannelSubmit.name
 		let channelName = myScreen.followChannelValue.value.toString()
 		if(channelName && channelName !==""){
-			await myMeow.addChannelInNetwork(networkName,channelName)
-			await myMeow.followChannel(channelName,networkName)
-			let networkChannels = await myMeow.getNetworkMetadata(networkName);
-			myScreen.showChannels(networkChannels["channels"],networkName)
-			myScreen.dynamicBox.focus()
-			handleFollowChannelSubmit()
-			handleFetchChannelFeed()
+			try{
+				await myMeow.addChannelInNetwork(networkName,channelName)
+				await myMeow.followChannel(channelName,networkName)
+				let networkChannels = await myMeow.getNetworkMetadata(networkName);
+				myScreen.showChannels(networkChannels["channels"],networkName)
+				myScreen.dynamicBox.focus()
+				handleFollowChannelSubmit()
+				handleFetchChannelFeed()
+			}catch(e){}
+		}
+	});
+	myScreen.leaveNetworkSubmit.on("click",async function(){
+		let networkName = myScreen.leaveNetworkSubmit.name
+		if(networkName && networkName !==""){
+			try{
+				await myMeow.leaveNetwork(networkName)
+			}catch(e){}
 		}
 	});
 }
@@ -262,7 +327,9 @@ async function infosInterval(){
 		let meowText = myScreen.sendMeowText.content.toString()
 		if(meowText !== undefined && meowText !== ""){
 			let twitterCheck = myScreen.sendMeowTwitter.checked;
-			await myMeow.sendMeow(meowText,twitterCheck);
+			try{
+				await myMeow.sendMeow(meowText,twitterCheck);
+			}catch(e){console.log("Channel not available");}
 			myScreen.sendMeowText.setContent("")
 			infosInterval()
 		}
@@ -398,12 +465,17 @@ async function handleConnections(){
 	});
 }
 async function routeOutput(){
+	let isObject = function(a) {
+    	return (!!a) && (a.constructor === Object);
+	};
 	 for (let func in console) {
                 //if (func == "error") continue;
-                if (func == "log" || func == "error"){
+                if (func == "log"  || func == "error"){
                         console[func] = function(text,extra) {
                                 if(extra === undefined) extra="";
                                 if(text.length > 0){
+					if(isObject(extra))
+						extra ="";
                                         myScreen.generalLogBox.log("  "+text+extra)
                                 }
                         }
