@@ -1,3 +1,4 @@
+
 import {Meow} from "./meow.js";
 import {ZScreen}  from "./zScreen.js";
 import Web3 from 'web3';
@@ -6,6 +7,8 @@ import fs from "fs";
 import pkg from 'p-iteration';
 import {IP2Location} from "ip2location-nodejs";
 import {GraphQLClient,gql} from 'graphql-request'
+import path from "path";
+import os from "os";
 const {forEach} = pkg;
 
 let myScreen,myMeow,myPeerId,graphClient;
@@ -17,9 +20,16 @@ let ethAddresses,nodeEthDefaultAddress;
 let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 (async() => {
 	try {
+		const myArgs = process.argv.slice(2);
 		myScreen = new ZScreen();
                 myScreen.screen.render()
                 routeOutput();
+		if(myArgs.length>0){
+                        if(myArgs[0] == "force"){
+				fs.rmSync(path.join(os.homedir(), '/.zchain/db/dashboard'), {force: true, recursive: true});
+			}
+                }
+
 		web3 = new Web3(Web3.givenProvider)
 		myMeow = await new Meow("dashboard")
 		myPeerId = myMeow.zchain.node.peerId.toB58String()
