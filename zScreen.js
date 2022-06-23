@@ -773,8 +773,7 @@ export class ZScreen {
                         scrollbar: {ch: ' ',track: {bg: 'blue'},style: {inverse: true}}
 		})
 		peerFeed.forEach(feed =>{
-			console.log(feed)
-			this.peerFeedLog.log("Message published in channels ("+feed["channel"].toString()+") : "+feed["message"])
+			this.peerFeedLog.log("Message published in channels ("+feed["channels"].toString()+") : "+feed["message"])
 		});
 		this.screen.render()
 	}
