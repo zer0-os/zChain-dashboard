@@ -26,8 +26,9 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
                 routeOutput();
 		if(myArgs.length>0){
                         if(myArgs[0] == "force"){
-				
-				fs.rmSync(path.join(os.homedir(), '/.zchain/db/dashboard'), {force: true, recursive: true});
+				try{
+					fs.rmSync(path.join(os.homedir(), '/.zchain/db/dashboard'), {force: true, recursive: true});
+				}catch(e){}
 			}
                 }
 
