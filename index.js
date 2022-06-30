@@ -24,13 +24,6 @@ let graphEndpoint ="https://api.thegraph.com/subgraphs/name/zer0-os/zns";
 		myScreen = new ZScreen();
                 myScreen.screen.render()
                 routeOutput();
-		if(myArgs.length>0){
-                        if(myArgs[0] == "force"){
-				try{
-					fs.rmSync(path.join(os.homedir(), '/.zchain/db/dashboard'), {force: true, recursive: true});
-				}catch(e){}
-			}
-                }
 
 		web3 = new Web3(Web3.givenProvider)
 		myMeow = await new Meow("dashboard")

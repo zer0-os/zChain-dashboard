@@ -5,8 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "startNew" : "node index.js force"
+    "start": "node index.js"
   },
   "author": "bustawei",
   "license": "ISC",
