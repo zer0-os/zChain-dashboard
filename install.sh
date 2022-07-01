@@ -1,3 +1,8 @@
+if [ -d "~/.config/yarn/link/" ]
+then
+	sudo rm -r ~/.config/yarn/link/zchain-core
+	sudo rm -r ~/.config/yarn/link/meow-app
+fi
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 npm install
