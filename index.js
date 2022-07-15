@@ -313,7 +313,7 @@ async function connectedInterval(){
 }
 async function infosInterval(){
 	try{
-		let followedPeersCount = Object.entries(myMeow.store.meowDbs.followingZIds.all).length
+		let followedPeersCount = Object.entries(await myMeow.getFollowedPeers()).length
         	let followedChannelsCount = Object.keys(await myMeow.getFollowedChannels()).length
 		let onGoingMeow =""
 		if(myScreen.sendMeowText)
